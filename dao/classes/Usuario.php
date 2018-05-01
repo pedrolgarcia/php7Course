@@ -6,6 +6,11 @@
         private $dessenha;
         private $dtcadastro;
 
+        public function __construct($login = "", $password = ""){
+            $this->setDeslogin($login);
+            $this->setDessenha($password);
+        }
+
         public function getIdusuario(){
             return $this->idusuario;
         }
@@ -43,14 +48,65 @@
             $res = $sql->select("SELECT * FROM tb_usuarios WHERE idusuario = :ID", array(":ID"=>$id));
 
             if(count($res) > 0){
-                $row = $res[0];
-
-                $this->setIdusuario($row['idusuario']);
-                $this->setDeslogin($row['deslogin']);
-                $this->setDessenha($row['dessenha']);
-                $this->setDtcadastro(new DateTime($row['dtcadastro']));
+                $this->setData($res[0]);
             }
             
+        }
+
+        public static function getList(){
+            $sql = new SQL();
+            return $sql->select("SELECT * FROM tb_usuarios"); 
+        }
+
+        public static function search($login){
+            $sql = new SQL();
+            return $sql->select("SELECT * FROM tb_usuarios WHERE deslogin LIKE :LOGIN", array(":LOGIN"=>"%".$login."%"));
+        } //Retorna todos os usuários que contém (%%) a string no nome
+
+        public function login($login, $password){
+            $sql = new SQL();
+            $res = $sql->select("SELECT * FROM tb_usuarios WHERE deslogin = :LOGIN AND dessenha = :PASSWORD", array(
+                ":LOGIN"=>$login,
+                ":PASSWORD"=>$password
+            ));
+
+            if(count($res) > 0){
+                $this->setData($res[0]);
+            } else {
+                throw new Exception("Login e/ou senha inválidos.");
+                
+            }
+        }
+
+        public function setData($data){
+            $this->setIdusuario($data['idusuario']);
+            $this->setDeslogin($data['deslogin']);
+            $this->setDessenha($data['dessenha']);
+            $this->setDtcadastro(new DateTime($data['dtcadastro']));
+        }
+
+        public function insert(){
+            $sql = new SQL();
+            $res = $sql->select("CALL sp_usuarios_insert(:LOGIN, :PASSWORD)", array(
+                ":LOGIN"=>$this->getDeslogin(),
+                ":PASSWORD"=>$this->getDessenha()
+            ));
+            if(count($res) > 0){
+                $this->setData($res[0]);
+            }
+        }
+
+        public function update($login, $password){
+            $this->setDeslogin($login);
+            $this->setDessenha($password);
+
+            $sql = new SQL();
+            $res = $sql->query("UPDATE tb_usuarios SET deslogin = :LOGIN, dessenha = :PASSWORD WHERE idusuario = :ID", array(
+                ":ID"=>$this->getIdusuario(),
+                ":LOGIN"=>$this->getDeslogin(),
+                ":PASSWORD"=>$this->getDessenha()
+            ));
+
         }
 
         public function __toString(){
