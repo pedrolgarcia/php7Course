@@ -8,18 +8,22 @@
     if($_SERVER["REQUEST_METHOD"] === "POST"){ //Verifica qual o método utilizado
         $file = $_FILES["fileUpload"]; //Superglobal que pega os arquivos enviados de um formulário ($_POST é para string)
         
-        if($files["error"]){ //Verifica se houve um erro
+        if($file["error"]){ //Verifica se houve um erro
             throw new Exception("Error: " . $file["error"]); //Lança uma exceção com a msg do erro
             
         }
 
-        $dirUp = "uploads";
+        $dirUp = "up";
         
-        if(!is_dir($$dirUp)){ //Criando um diretório para os uploads
+        if(!is_dir($dirUp)){ //Criando um diretório para os uploads
             mkdir($dirUp); //Quem criou tem permissão de escrita
         }
 
-        
+        if(move_uploaded_file($file["tmp_name"], $dirUp . DIRECTORY_SEPARATOR . $file["name"])){
+            echo "Upload realizado com sucesso!";
+        }else{
+            throw new Exception("Não foi possível realizar o upload!");
+        }
 
     }
 
