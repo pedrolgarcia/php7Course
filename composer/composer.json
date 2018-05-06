@@ -1,0 +1,15 @@
+{
+    "name": "pedrolgarcia/composer",
+    "description": "Aula composer teste",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Pedro Lopes",
+            "email": "pedrolopes.info@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "monolog/monolog":"1.0.*"
+    }
+}
